@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 class Customer(models.Model):
     name = models.CharField('ФИО', max_length=255)
@@ -25,7 +26,7 @@ class Car(models.Model):
 
 class Driver(models.Model):
     user = models.OneToOneField(
-        'auth.User',
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='driver',
         verbose_name='Пользователь',

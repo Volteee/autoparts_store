@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Главная страница</h2>
+    
+    {% if welcome_message %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> {{ welcome_message }}
+    </div>
+    {% endif %}
+    
+    {% if quick_actions %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="bi bi-lightning"></i> Быстрые действия
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for action in quick_actions %}
+                <div class="col-md-3 mb-3">
+                    <a href="{{ action.url }}" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi {{ action.icon }} display-4 mb-3 text-primary"></i>
+                            <h5 class="card-title">{{ action.label }}</h5>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if user.role == 'operator' %}
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-card-checklist"></i> Последние заказы
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Список последних заказов появится здесь</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -16,9 +16,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
+
+from users.views import CustomHomeView, CustomLoginView, logout_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('orders/', include('orders.urls')),
     path('dealers/', include('dealers.urls')),
+    # Перенаправление корневого URL на главную страницу
+    path('', RedirectView.as_view(url='/home/', permanent=True)),
+
+    # Главная страница
+    path('home/', CustomHomeView.as_view(), name='home'),
+
+    # Вход/выход
+    path('login/', CustomLoginView.as_view(), name='login'),
+    path('logout/', logout_view, name='logout'),
 ]

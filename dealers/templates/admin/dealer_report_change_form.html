@@ -1,0 +1,33 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block after_field_sets %}
+{{ block.super }}
+
+{% if original.waybills_generated %}
+<div style="margin: 20px 0; padding: 15px; background-color: #f8f8f8; border: 1px solid #ddd;">
+    <h2>Сгенерированные транспортные накладные</h2>
+    <ul>
+        {% for waybill in original.waybills.all %}
+        <li style="margin: 10px 0;">
+            <a href="{{ waybill.waybill_file.url }}" target="_blank" style="font-size: 14px;">
+                <strong>{{ waybill.dealer.customer.name }}</strong> -
+                {{ waybill.created_at|date:"d.m.Y H:i" }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block object-tools-items %}
+  {{ block.super }}
+  {% if not original.waybills_generated and original.report_file %}
+  <li>
+      <a href="{% url 'admin:generate_dealer_waybills' object_id %}" class="historylink">
+          Сгенерировать накладные
+      </a>
+  </li>
+  {% endif %}
+{% endblock %}

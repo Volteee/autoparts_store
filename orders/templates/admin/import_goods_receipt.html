@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div id="content-main">
+  <h1>Импорт приходной накладной</h1>
+  <p>
+    Загрузите файл Excel со следующей структурой:
+  </p>
+  <ul>
+    <li><strong>part_number</strong> - номер детали</li>
+    <li><strong>part_name</strong> - название детали</li>
+    <li><strong>quantity</strong> - количество</li>
+    <li><strong>price</strong> - цена за единицу</li>
+  </ul>
+  
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="submit-row">
+      <input type="submit" value="Импортировать" class="default" name="_import">
+      <a href="{% url 'admin:orders_goodsreceipt_changelist' %}" class="button">Отмена</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div id="content-main">
+  <h1>Генерация заказов поставщикам</h1>
+  <p>
+    Эта операция создаст заказы поставщикам на основе выбранных покупателями позиций в картах доставки.
+  </p>
+  <p>
+    <strong>Внимание:</strong> Будут созданы заказы только для позиций, которые еще не были включены в заказы поставщикам.
+  </p>
+  
+  <form method="post">
+    {% csrf_token %}
+    <div class="submit-row">
+      <input type="submit" value="Сгенерировать заказы" class="default" name="_generate">
+      <a href="{% url 'admin:orders_supplierorder_changelist' %}" class="button">Отмена</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

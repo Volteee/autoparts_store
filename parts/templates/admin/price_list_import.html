@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div id="content-main">
+  <h1>Импорт прайс-листа</h1>
+  <p>
+    Вы собираетесь импортировать данные из прайс-листа:
+    <strong>{{ pricelist.file.name }}</strong> ({{ pricelist.supplier.name }})
+  </p>
+  <p>
+    <strong>Важно:</strong> Существующие данные для этого прайс-листа будут заменены.
+  </p>
+  
+  <form method="post">
+    {% csrf_token %}
+    <div class="submit-row">
+      <input type="submit" value="Начать импорт" class="default" name="_import">
+      <a href="{% url 'admin:parts_pricelist_change' pricelist.id %}" class="button">Отмена</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

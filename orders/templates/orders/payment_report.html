@@ -1,0 +1,34 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div id="content-main">
+  <h1>Отчет по рекомендованным платежам</h1>
+  <p>Текущий месяц: {{ current_month }}, Предыдущий месяц: {{ prev_month }}</p>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Поставщик</th>
+        <th>Приходы за {{ prev_month }}</th>
+        <th>Приходы за {{ current_month }}</th>
+        <th>Рекомендуемая предоплата</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in report_data %}
+      <tr>
+        <td>{{ item.supplier.name }}</td>
+        <td>{{ item.prev_month|floatformat:2 }} руб.</td>
+        <td>{{ item.current_month|floatformat:2 }} руб.</td>
+        <td><strong>{{ item.recommended|floatformat:2 }} руб.</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div style="margin-top: 20px;">
+    <p>Формула расчета: [Текущий месяц] + 0.5 × ([Текущий месяц] - [Предыдущий месяц])</p>
+  </div>
+</div>
+{% endblock %}

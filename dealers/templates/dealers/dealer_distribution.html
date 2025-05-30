@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div id="content-main">
+  <h1>Формирование отчета по распределению товаров для дилеров</h1>
+
+  <p>Эта операция сгенерирует Excel-отчет с расчетом количества товаров для отправки каждому дилеру.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <div class="submit-row">
+      <input type="submit" value="Сгенерировать отчет" class="default" name="_generate">
+      <a href="{% url 'admin:dealers_dealerdistributionreport_changelist' %}" class="button">Отмена</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

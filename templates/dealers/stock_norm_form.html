@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{% if object %}Редактирование нормы запаса{% else %}Добавление новой нормы запаса{% endif %}</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        {{ form.dealer.label_tag }}
+        {{ form.dealer }}
+        {% if form.dealer.errors %}
+            <div class="text-danger">{{ form.dealer.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.part.label_tag }}
+        {{ form.part }}
+        {% if form.part.errors %}
+            <div class="text-danger">{{ form.part.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.norm.label_tag }}
+        {{ form.norm }}
+        {% if form.norm.errors %}
+            <div class="text-danger">{{ form.norm.errors }}</div>
+        {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{% url 'stock_norm_list' %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Приходные накладные</h1>
+<a href="{% url 'goods_receipt_create' %}" class="btn btn-primary">Создать накладную</a>
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Поставщик</th>
+            <th>Заказ поставщику</th>
+            <th>Дата получения</th>
+            <th>Общая сумма</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for receipt in receipts %}
+        <tr>
+            <td>{{ receipt.id }}</td>
+            <td>{{ receipt.supplier_order.supplier.name }}</td>
+            <td>{% if receipt.supplier_order %}#{{ receipt.supplier_order.id }}{% else %}-{% endif %}</td>
+            <td>{{ receipt.received_at|date:"d.m.Y H:i" }}</td>
+            <td>{{ receipt.total_amount|default:"0.00" }} руб.</td>
+            <td>
+                <a href="#" class="btn btn-sm btn-info">Просмотр</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">Нет накладных</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Обработка файлов от дилеров</h1>
+<p>Эта операция обработает все загруженные дилерами файлы и обновит данные о текущих запасах.</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Обработать файлы</button>
+    <a href="{% url 'dealer_list' %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

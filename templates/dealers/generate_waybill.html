@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Генерация транспортной накладной</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        {{ form.report.label_tag }}
+        {{ form.report }}
+    </div>
+    <div class="mb-3">
+        {{ form.dealer.label_tag }}
+        {{ form.dealer }}
+    </div>
+    <button type="submit" class="btn btn-primary">Сгенерировать PDF</button>
+</form>
+{% endblock %}

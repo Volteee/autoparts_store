@@ -11,6 +11,7 @@ class CustomUser(AbstractUser):
         SUPPLY_MANAGER = 'supply_manager', _('Менеджер по поставкам')
         STOREKEEPER = 'storekeeper', _('Кладовщик')
         DELIVERY_MANAGER = 'delivery_manager', _('Начальник службы доставки')
+        DRIVER = 'driver', _('Водитель службы доставки')
 
     role = models.CharField(
         max_length=20,

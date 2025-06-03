@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{% if object %}Редактирование назначения{% else %}Создание назначения водителя{% endif %}</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        {{ form.driver.label_tag }}
+        {{ form.driver }}
+        {% if form.driver.errors %}
+            <div class="text-danger">{{ form.driver.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.date.label_tag }}
+        {{ form.date }}
+        {% if form.date.errors %}
+            <div class="text-danger">{{ form.date.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.district.label_tag }}
+        {{ form.district }}
+        {% if form.district.errors %}
+            <div class="text-danger">{{ form.district.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.orders.label_tag }}
+        {{ form.orders }}
+        {% if form.orders.errors %}
+            <div class="text-danger">{{ form.orders.errors }}</div>
+        {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{% url 'driver_assignment_list' %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

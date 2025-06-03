@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Генерация файлов для дилеров</h1>
+<p>Эта операция создаст Excel-файлы для всех активных дилеров с текущими данными о нормах запасов.</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Сгенерировать файлы</button>
+    <a href="{% url 'dealer_list' %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

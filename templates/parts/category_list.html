@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Категории запчастей</h1>
+<a href="{% url 'category_create' %}" class="btn btn-primary">Добавить категорию</a>
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Родительская категория</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for category in categories %}
+        <tr>
+            <td>{{ category.name }}</td>
+            <td>{{ category.parent.name|default:"-" }}</td>
+            <td>
+                <a href="{% url 'category_update' category.pk %}" class="btn btn-sm btn-warning">Изменить</a>
+                <a href="{% url 'category_delete' category.pk %}" class="btn btn-sm btn-danger">Удалить</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">Нет категорий</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

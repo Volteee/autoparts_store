@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{% if object %}Редактирование запчасти{% else %}Добавление новой запчасти{% endif %}</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        {{ form.category.label_tag }}
+        {{ form.category }}
+        {% if form.category.errors %}
+            <div class="text-danger">{{ form.category.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.name.label_tag }}
+        {{ form.name }}
+        {% if form.name.errors %}
+            <div class="text-danger">{{ form.name.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.original_number.label_tag }}
+        {{ form.original_number }}
+        {% if form.original_number.errors %}
+            <div class="text-danger">{{ form.original_number.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.manufacturer.label_tag }}
+        {{ form.manufacturer }}
+        {% if form.manufacturer.errors %}
+            <div class="text-danger">{{ form.manufacturer.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.location.label_tag }}
+        {{ form.location }}
+        {% if form.location.errors %}
+            <div class="text-danger">{{ form.location.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.description.label_tag }}
+        {{ form.description }}
+        {% if form.description.errors %}
+            <div class="text-danger">{{ form.description.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.synonyms.label_tag }}
+        {{ form.synonyms }}
+        <small class="form-text text-muted">Разделяйте названия запятыми</small>
+        {% if form.synonyms.errors %}
+            <div class="text-danger">{{ form.synonyms.errors }}</div>
+        {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{% url 'part_list' %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

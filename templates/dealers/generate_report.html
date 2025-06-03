@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Генерация отчета</h1>
+<p>Отчет "{{ object }}" готовится к скачиванию...</p>
+<p>Если скачивание не началось автоматически, <a href="{{ object.report_file.url }}">нажмите здесь</a>.</p>
+{% endblock %}

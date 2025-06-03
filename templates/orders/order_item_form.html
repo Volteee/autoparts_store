@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{% if object %}Редактирование позиции{% else %}Добавление позиции в заказ{% endif %}</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        {{ form.part.label_tag }}
+        {{ form.part }}
+        {% if form.part.errors %}
+            <div class="text-danger">{{ form.part.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.quantity.label_tag }}
+        {{ form.quantity }}
+        {% if form.quantity.errors %}
+            <div class="text-danger">{{ form.quantity.errors }}</div>
+        {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{% url 'customer_order_detail' order.id %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

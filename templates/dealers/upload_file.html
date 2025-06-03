@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Загрузка файла от дилера</h1>
+<p>Пожалуйста, выберите Excel-файл, полученный от дилера, для обработки.</p>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+        {{ form.dealer_file.label_tag }}
+        {{ form.dealer_file }}
+        {% if form.dealer_file.errors %}
+            <div class="text-danger">{{ form.dealer_file.errors }}</div>
+        {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Загрузить</button>
+    <a href="{% url 'dealer_list' %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

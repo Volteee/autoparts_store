@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{% if object %}Редактирование платежа{% else %}Создание платежа поставщику{% endif %}</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        {{ form.supplier.label_tag }}
+        {{ form.supplier }}
+        {% if form.supplier.errors %}
+            <div class="text-danger">{{ form.supplier.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.month.label_tag }}
+        {{ form.month }}
+        {% if form.month.errors %}
+            <div class="text-danger">{{ form.month.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.amount.label_tag }}
+        {{ form.amount }}
+        {% if form.amount.errors %}
+            <div class="text-danger">{{ form.amount.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3 form-check">
+        {{ form.is_prepayment }}
+        {{ form.is_prepayment.label_tag }}
+        {% if form.is_prepayment.errors %}
+            <div class="text-danger">{{ form.is_prepayment.errors }}</div>
+        {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{% url 'supplier_payment_list' %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

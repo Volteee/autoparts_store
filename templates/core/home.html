@@ -4,43 +4,295 @@
 
 {% block content %}
 <div class="container-fluid">
-    <h2 class="mb-4">Главная страница</h2>
-    
-    {% if welcome_message %}
+    <h2 class="mb-4">Добро пожаловать, {{ user.get_full_name|default:user.username }}!</h2>
+
     <div class="alert alert-info">
-        <i class="bi bi-info-circle"></i> {{ welcome_message }}
+        <i class="bi bi-info-circle"></i> Ваша роль: <strong>{{ user.get_role_display }}</strong>
     </div>
-    {% endif %}
-    
-    {% if quick_actions %}
+
     <div class="card mb-4">
         <div class="card-header">
             <i class="bi bi-lightning"></i> Быстрые действия
         </div>
         <div class="card-body">
             <div class="row">
-                {% for action in quick_actions %}
+                {% if user.role == 'operator' %}
+                <!-- Быстрые действия для Оператора -->
                 <div class="col-md-3 mb-3">
-                    <a href="{{ action.url }}" class="card h-100 text-decoration-none">
+                    <a href="{% url 'customer_create' %}" class="card h-100 text-decoration-none">
                         <div class="card-body text-center">
-                            <i class="bi {{ action.icon }} display-4 mb-3 text-primary"></i>
-                            <h5 class="card-title">{{ action.label }}</h5>
+                            <i class="bi bi-person-plus display-4 mb-3 text-primary"></i>
+                            <h5 class="card-title">Добавить клиента</h5>
                         </div>
                     </a>
                 </div>
-                {% endfor %}
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'car_create' %}" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-car-front display-4 mb-3 text-success"></i>
+                            <h5 class="card-title">Добавить авто</h5>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'customer_order_create' %}" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-cart-plus display-4 mb-3 text-warning"></i>
+                            <h5 class="card-title">Создать заказ</h5>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if user.role == 'delivery_manager' %}
+                <!-- Быстрые действия для Начальника службы доставки -->
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'driver_create' %}" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-plus display-4 mb-3 text-primary"></i>
+                            <h5 class="card-title">Добавить водителя</h5>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'driver_assign_user' %}" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-link-45deg display-4 mb-3 text-info"></i>
+                            <h5 class="card-title">Привязать пользователей</h5>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'delivery_orders' %}" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-truck display-4 mb-3 text-success"></i>
+                            <h5 class="card-title">Заказы на доставку</h5>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if user.role == 'supply_manager' %}
+                <!-- Быстрые действия для Менеджера по поставкам -->
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'supplier_order_list' %}" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clipboard-check display-4 mb-3 text-primary"></i>
+                            <h5 class="card-title">Заказы поставщикам</h5>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'payment_report' %}" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-currency-exchange display-4 mb-3 text-success"></i>
+                            <h5 class="card-title">Отчет по платежам</h5>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'goods_receipt_create' %}" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-box-seam display-4 mb-3 text-warning"></i>
+                            <h5 class="card-title">Приходные накладные</h5>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if user.role == 'parts_manager' %}
+                <!-- Быстрые действия для Менеджера по деталям -->
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'part_create' %}" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-gear display-4 mb-3 text-primary"></i>
+                            <h5 class="card-title">Добавить деталь</h5>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'pricelist_create' %}" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-upload display-4 mb-3 text-info"></i>
+                            <h5 class="card-title">Загрузить прайс</h5>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'manufacturer_list' %}" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-building display-4 mb-3 text-success"></i>
+                            <h5 class="card-title">Производители</h5>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if user.role == 'storekeeper' %}
+                <!-- Быстрые действия для Кладовщика -->
+                <div class="col-md-3 mb-3">
+                    <a href="{% url 'goods_receipt_list' %}" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clipboard-check display-4 mb-3 text-primary"></i>
+                            <h5 class="card-title">Приходные накладные</h5>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="#" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-printer display-4 mb-3 text-success"></i>
+                            <h5 class="card-title">Печать ценников</h5>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if user.role == 'driver' %}
+                <!-- Быстрые действия для Водителя -->
+                <div class="col-md-3 mb-3">
+                    <a href="#" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-list-task display-4 mb-3 text-primary"></i>
+                            <h5 class="card-title">Мои доставки</h5>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="#" class="card h-100 text-decoration-none">
+                        <div class="card-body text-center">
+                            <i class="bi bi-map display-4 mb-3 text-info"></i>
+                            <h5 class="card-title">Карты доставки</h5>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
-    {% endif %}
-    
+
     {% if user.role == 'operator' %}
-    <div class="card">
+    <!-- Секция для Оператора -->
+    <div class="card mb-4">
         <div class="card-header">
             <i class="bi bi-card-checklist"></i> Последние заказы
         </div>
         <div class="card-body">
-            <p class="text-muted">Список последних заказов появится здесь</p>
+            {% if orders %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Номер</th>
+                            <th>Клиент</th>
+                            <th>Автомобиль</th>
+                            <th>Сумма</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td><a href="{% url 'customer_order_detail' order.pk %}">#{{ order.id }}</a></td>
+                            <td>{{ order.customer.name }}</td>
+                            <td>{{ order.car.make }} {{ order.car.model }}</td>
+                            <td>{{ order.total_amount }} руб.</td>
+                            <td>
+                                <span class="badge bg-{% if order.status == 'new' %}warning{% elif order.status == 'completed' %}success{% else %}info{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <a href="{% url 'customer_order_list' %}" class="btn btn-outline-primary mt-2">
+                Все заказы <i class="bi bi-arrow-right"></i>
+            </a>
+            {% else %}
+            <div class="alert alert-info">
+                У вас пока нет заказов. <a href="{% url 'customer_order_create' %}">Создать первый заказ</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if user.role == 'delivery_manager' %}
+    <!-- Секция для Начальника службы доставки -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="bi bi-truck"></i> Активные доставки
+        </div>
+        <div class="card-body">
+            {% if active_deliveries %}
+            <div class="list-group">
+                {% for delivery in active_deliveries %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="mb-1">Доставка #{{ delivery.id }}</h6>
+                            <small class="text-muted">Водитель: {{ delivery.driver.name }}</small>
+                        </div>
+                        <div>
+                            <span class="badge bg-warning">{{ delivery.get_status_display }}</span>
+                            <a href="{% url 'driver_assignment_update' delivery.pk %}" class="btn btn-sm btn-outline-primary ms-2">
+                                Управление
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <a href="{% url 'driver_assignment_list' %}" class="btn btn-outline-primary mt-3">
+                Все доставки <i class="bi bi-arrow-right"></i>
+            </a>
+            {% else %}
+            <div class="alert alert-info">
+                На сегодня активных доставок нет
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if user.role == 'supply_manager' %}
+    <!-- Секция для Менеджера по поставкам -->
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-box-seam"></i> Ожидающие поставки
+        </div>
+        <div class="card-body">
+            {% if pending_orders %}
+            <div class="list-group">
+                {% for order in pending_orders %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="mb-1">Заказ поставщику #{{ order.id }}</h6>
+                            <small class="text-muted">Поставщик: {{ order.supplier.name }}</small>
+                        </div>
+                        <div>
+                            <span class="badge bg-{% if order.status == 'pending' %}warning{% else %}info{% endif %}">
+                                {{ order.get_status_display }}
+                            </span>
+                            <a href="{% url 'supplier_order_update' order.pk %}" class="btn btn-sm btn-outline-primary ms-2">
+                                Подробнее
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <a href="{% url 'supplier_order_list' %}" class="btn btn-outline-primary mt-3">
+                Все заказы поставщикам <i class="bi bi-arrow-right"></i>
+            </a>
+            {% else %}
+            <div class="alert alert-success">
+                Все заказы поставщикам обработаны
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endif %}

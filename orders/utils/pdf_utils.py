@@ -43,11 +43,11 @@ def generate_delivery_map_pdf(delivery_map):
 
     # Информация о заказе
     c.setFont("Helvetica", 10)
-    c.drawString(2 * cm, A4[1] - 3 * cm, f"Номер заказа: #{delivery_map.order.id}")
+    c.drawString(2 * cm, A4[1] - 3 * cm, f"Номер заказа: #{delivery_map.customer_order.id}")
     c.drawString(2 * cm, A4[1] - 3.5 * cm, f"Дата: {delivery_map.created_at.strftime('%d.%m.%Y %H:%M')}")
-    c.drawString(2 * cm, A4[1] - 4 * cm, f"Покупатель: {delivery_map.order.customer.name}")
-    c.drawString(2 * cm, A4[1] - 4.5 * cm, f"Телефон: {delivery_map.order.customer.phone}")
-    c.drawString(2 * cm, A4[1] - 5 * cm, f"Автомобиль: {delivery_map.order.car}")
+    c.drawString(2 * cm, A4[1] - 4 * cm, f"Покупатель: {delivery_map.customer_order.customer.name}")
+    c.drawString(2 * cm, A4[1] - 4.5 * cm, f"Телефон: {delivery_map.customer_order.customer.phone}")
+    c.drawString(2 * cm, A4[1] - 5 * cm, f"Автомобиль: {delivery_map.customer_order.car}")
 
     # Таблица с деталями
     data = []
@@ -158,7 +158,7 @@ def generate_customer_order_pdf(customer_order):
 
     # Рассчитываем срок доставки (если есть карта доставки)
     delivery_days = None
-    if customer_order.delivery_map:
+    if hasattr(customer_order, "delivery_map"):
         try:
             # Создаем список из правых границ диапазонов
             days_list = []
@@ -197,7 +197,7 @@ def generate_customer_order_pdf(customer_order):
     # Добавляем позиции
     total = 0
     selected_items = []
-    if customer_order.delivery_map:
+    if hasattr(customer_order, "delivery_map"):
         selected_items = customer_order.delivery_map.items.filter(is_selected=True)
 
     for i, item in enumerate(selected_items, 1):

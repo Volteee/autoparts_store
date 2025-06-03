@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Редактирование позиции карты доставки</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        {{ form.delivery_option.label_tag }}
+        {{ form.delivery_option }}
+        {% if form.delivery_option.errors %}
+            <div class="text-danger">{{ form.delivery_option.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3">
+        {{ form.quantity.label_tag }}
+        {{ form.quantity }}
+        {% if form.quantity.errors %}
+            <div class="text-danger">{{ form.quantity.errors }}</div>
+        {% endif %}
+    </div>
+    <div class="mb-3 form-check">
+        {{ form.is_selected }}
+        {{ form.is_selected.label_tag }}
+        {% if form.is_selected.errors %}
+            <div class="text-danger">{{ form.is_selected.errors }}</div>
+        {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{% url 'delivery_map_detail' object.delivery_map.pk %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

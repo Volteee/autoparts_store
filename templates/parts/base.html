@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Управление автозапчастями{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Автозапчасти</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Детали
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'category_list' %}">Категории</a></li>
+                            <li><a class="dropdown-item" href="{% url 'manufacturer_list' %}">Производители</a></li>
+                            <li><a class="dropdown-item" href="{% url 'part_list' %}">Запчасти</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Поставки
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'supplier_list' %}">Поставщики</a></li>
+                            <li><a class="dropdown-item" href="{% url 'pricelist_list' %}">Прайс-листы</a></li>
+                            <li><a class="dropdown-item" href="{% url 'deliveryoption_list' %}">Варианты доставки</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <span class="navbar-text">
+                    {{ request.user.username }} ({{ request.user.get_role_display }})
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

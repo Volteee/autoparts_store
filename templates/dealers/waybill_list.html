@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Транспортные накладные для дилеров</h1>
+<a href="{% url 'generate_waybill' %}" class="btn btn-primary">Сгенерировать новую накладную</a>
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Дилер</th>
+            <th>Отчет</th>
+            <th>Дата создания</th>
+            <th>Файл накладной</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for waybill in waybills %}
+        <tr>
+            <td>{{ waybill.dealer.customer.name }}</td>
+            <td>{{ waybill.report }}</td>
+            <td>{{ waybill.created_at|date:"d.m.Y H:i" }}</td>
+            <td>
+                {% if waybill.waybill_file %}
+                    <a href="{{ waybill.waybill_file.url }}" download>Скачать PDF</a>
+                {% else %}
+                    Файл не сгенерирован
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Нет доступных накладных</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

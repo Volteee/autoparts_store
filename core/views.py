@@ -40,7 +40,19 @@ class DriverUpdateView(RoleRequiredMixin, UpdateView):
     model = Driver
     form_class = DriverForm
     template_name = 'core/driver_form.html'
-    success_url = '/core/drivers/'
+
+    def get_success_url(self):
+        return reverse('/core/driver_detail', kwargs={'pk': self.object.pk})
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'Данные водителя {self.object.name} обновлены')
+        return response
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user_role'] = 'driver'
+        return kwargs
 
 
 class CustomerListView(RoleRequiredMixin, ListView):
@@ -194,21 +206,3 @@ class DriverDetailView(RoleRequiredMixin, DetailView):
         return context
 
 
-class DriverUpdateView(RoleRequiredMixin, UpdateView):
-    allowed_roles = ['delivery_manager']
-    model = Driver
-    form_class = DriverForm
-    template_name = 'core/driver_form.html'
-
-    def get_success_url(self):
-        return reverse('/core/driver_detail', kwargs={'pk': self.object.pk})
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.success(self.request, f'Данные водителя {self.object.name} обновлены')
-        return response
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user_role'] = 'driver'
-        return kwargs

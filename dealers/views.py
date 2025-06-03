@@ -1,12 +1,21 @@
+from django import forms
 from django.views.generic import TemplateView
-from django.http import HttpResponse
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, FormView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.urls import reverse_lazy
+from django.http import FileResponse
+from .forms import DealerForm, DealerStockNormForm, FileUploadForm, DealerWaybillGenerationForm
+from .utils import generate_dealer_files, process_dealer_files, generate_dealer_report_excel, \
+    generate_dealer_waybill_pdf
+from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib import messages
 from django.shortcuts import redirect, render
-from .models import Dealer, DealerStockNorm, DealerDistributionReport, Part
+from .models import Dealer, DealerStockNorm, DealerDistributionReport, Part, DealerWaybill
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment
+from core.mixins import RoleRequiredMixin
 import os
 
 
@@ -108,4 +117,154 @@ class DealerDistributionView(TemplateView):
         report.save()
 
         messages.success(request, 'Отчет успешно сгенерирован!')
-        return redirect(reverse('admin:dealers_dealerdistributionreport_changelist'))
+        return redirect('dealers/reports/')
+
+
+# Дилеры
+class DealerListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+    model = Dealer
+    template_name = 'dealers/dealer_list.html'
+    context_object_name = 'dealers'
+    allowed_roles = ['supply_manager']
+
+
+class DealerCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
+    model = Dealer
+    form_class = DealerForm
+    template_name = 'dealers/dealer_form.html'
+    success_url = reverse_lazy('dealer_list')
+    allowed_roles = ['supply_manager']
+
+    # Добавляем обработку формы
+    def form_valid(self, form):
+        # Устанавливаем связь с клиентом
+        form.instance.customer = form.cleaned_data['customer']
+        return super().form_valid(form)
+
+class DealerUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
+    model = Dealer
+    form_class = DealerForm
+    template_name = 'dealers/dealer_form.html'
+    success_url = reverse_lazy('dealer_list')
+    allowed_roles = ['supply_manager']
+
+    # Добавляем обработку формы
+    def form_valid(self, form):
+        form.instance.customer = form.cleaned_data['customer']
+        return super().form_valid(form)
+
+
+class DealerDeleteView(LoginRequiredMixin, RoleRequiredMixin, DeleteView):
+    model = Dealer
+    template_name = 'dealers/dealer_confirm_delete.html'
+    success_url = reverse_lazy('dealer_list')
+    allowed_roles = ['supply_manager']
+
+
+# Нормы запасов
+class DealerStockNormListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+    model = DealerStockNorm
+    template_name = 'dealers/stock_norm_list.html'
+    context_object_name = 'norms'
+    allowed_roles = ['supply_manager']
+
+
+class DealerStockNormCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
+    model = DealerStockNorm
+    form_class = DealerStockNormForm
+    template_name = 'dealers/stock_norm_form.html'
+    success_url = reverse_lazy('stock_norm_list')
+    allowed_roles = ['supply_manager']
+
+
+class DealerStockNormUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
+    model = DealerStockNorm
+    form_class = DealerStockNormForm
+    template_name = 'dealers/stock_norm_form.html'
+    success_url = reverse_lazy('stock_norm_list')
+    allowed_roles = ['supply_manager']
+
+
+# Работа с файлами
+class GenerateDealerFilesView(LoginRequiredMixin, RoleRequiredMixin, FormView):
+    template_name = 'dealers/generate_files.html'
+    form_class = forms.Form
+    success_url = reverse_lazy('dealer_list')
+    allowed_roles = ['supply_manager']
+
+    def form_valid(self, form):
+        generate_dealer_files()
+        return super().form_valid(form)
+
+
+class ProcessDealerFilesView(LoginRequiredMixin, RoleRequiredMixin, FormView):
+    template_name = 'dealers/process_files.html'
+    form_class = forms.Form
+    success_url = reverse_lazy('dealer_list')
+    allowed_roles = ['supply_manager']
+
+    def form_valid(self, form):
+        count = process_dealer_files()
+        return super().form_valid(form)
+
+
+class FileUploadView(LoginRequiredMixin, RoleRequiredMixin, FormView):
+    template_name = 'dealers/upload_file.html'
+    form_class = FileUploadForm
+    success_url = reverse_lazy('dealer_list')
+    allowed_roles = ['supply_manager']
+
+    def form_valid(self, form):
+        file = form.cleaned_data['dealer_file']
+        # Сохраняем файл для обработки
+        upload_dir = os.path.join(settings.MEDIA_ROOT, 'dealer_uploads')
+        os.makedirs(upload_dir, exist_ok=True)
+        with open(os.path.join(upload_dir, file.name), 'wb+') as destination:
+            for chunk in file.chunks():
+                destination.write(chunk)
+        return super().form_valid(form)
+
+
+# Отчеты
+class DealerDistributionReportListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+    model = DealerDistributionReport
+    template_name = 'dealers/report_list.html'
+    context_object_name = 'reports'
+    allowed_roles = ['supply_manager']
+
+    def get_queryset(self):
+        return DealerDistributionReport.objects.order_by('-created_at')
+
+
+class GenerateReportView(LoginRequiredMixin, RoleRequiredMixin, DetailView):
+    model = DealerDistributionReport
+    template_name = 'dealers/generate_report.html'
+    allowed_roles = ['supply_manager']
+
+    def get(self, request, *args, **kwargs):
+        report = self.get_object()
+        file_path = generate_dealer_report_excel(report.id)
+        return FileResponse(open(file_path, 'rb'), as_attachment=True)
+
+
+# Накладные
+class DealerWaybillListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+    model = DealerWaybill
+    template_name = 'dealers/waybill_list.html'
+    context_object_name = 'waybills'
+    allowed_roles = ['supply_manager']
+
+    def get_queryset(self):
+        return DealerWaybill.objects.order_by('-created_at')
+
+
+class GenerateWaybillView(LoginRequiredMixin, RoleRequiredMixin, FormView):
+    template_name = 'dealers/generate_waybill.html'
+    form_class = DealerWaybillGenerationForm
+    allowed_roles = ['supply_manager']
+
+    def form_valid(self, form):
+        report = form.cleaned_data['report']
+        dealer = form.cleaned_data['dealer']
+        pdf_buffer = generate_dealer_waybill_pdf(report.id, dealer.id)
+        return FileResponse(pdf_buffer, as_attachment=True, filename=f'waybill_{dealer.id}.pdf')

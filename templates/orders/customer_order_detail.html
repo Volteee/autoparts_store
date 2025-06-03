@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Заказ #{{ order.id }}</h1>
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Информация о заказе</h5>
+        <p><strong>Покупатель:</strong> {{ order.customer.name }}</p>
+        <p><strong>Телефон:</strong> {{ order.phone }}</p>
+        <p><strong>Автомобиль:</strong> {{ order.car.make }} {{ order.car.model }} ({{ order.car.year }})</p>
+        <p><strong>VIN:</strong> {{ order.car.vin }}</p>
+        <p><strong>Статус:</strong> {{ order.get_status_display }}</p>
+        <p><strong>Сроки доставки:</strong> {{ order.min_delivery_time }} - {{ order.max_delivery_time }} дней</p>
+        {% if order.delivery_required %}
+        <p><strong>Доставка:</strong>
+            {{ order.delivery_district }}, {{ order.delivery_address }}
+            {% if order.delivery_time %}<br>Время: {{ order.delivery_time|date:"d.m.Y H:i" }}{% endif %}
+        </p>
+        {% endif %}
+        <p><strong>Дата создания:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Позиции заказа</h5>
+        {% if can_edit %}
+        <a href="{% url 'order_item_create' order_pk=order.pk %}" class="btn btn-sm btn-primary">Добавить позицию</a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Деталь</th>
+                    <th>Количество</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.part.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>
+                        {% if can_edit %}
+                        <a href="{% url 'order_item_update' item.pk %}" class="btn btn-sm btn-warning">Изменить</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">Нет позиций</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if order.delivery_map %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Карта доставки</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Дата создания:</strong> {{ order.delivery_map.created_at|date:"d.m.Y H:i" }}</p>
+        <p><strong>Наценка:</strong> {{ order.delivery_map.markup_percentage }}%</p>
+        <a href="{% url 'delivery_map_detail' order.delivery_map.pk %}" class="btn btn-info">Просмотр карты</a>
+        <a href="{% url 'delivery_map_pdf' order.delivery_map.pk %}" class="btn btn-secondary">PDF</a>
+    </div>
+</div>
+{% endif %}
+
+<div class="d-flex justify-content-between">
+    {% if can_edit %}
+    <a href="{% url 'customer_order_update' order.pk %}" class="btn btn-warning">Редактировать заказ</a>
+    {% endif %}
+    <a href="{% url 'customer_order_list' %}" class="btn btn-secondary">Назад к списку</a>
+    <a href="{% url 'customer_order_pdf' order.pk %}" class="btn btn-primary">Печать заказа</a>
+</div>
+{% endblock %}

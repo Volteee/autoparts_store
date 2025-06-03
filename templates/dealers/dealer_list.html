@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Дилеры</h1>
+<a href="{% url 'dealer_create' %}" class="btn btn-primary">Добавить дилера</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Клиент</th>  <!-- Изменяем заголовок -->
+            <th>Контактное лицо</th>
+            <th>Email</th>
+            <th>Статус</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dealer in dealers %}
+        <tr>
+            <td>{{ dealer.customer.name }}</td>  <!-- Используем customer.name -->
+            <td>{{ dealer.contact_person }}</td>
+            <td>{{ dealer.email }}</td>
+            <td>{% if dealer.is_active %}Активен{% else %}Неактивен{% endif %}</td>
+            <td>
+                <a href="{% url 'dealer_update' dealer.pk %}" class="btn btn-sm btn-warning">Изменить</a>
+                <a href="{% url 'dealer_delete' dealer.pk %}" class="btn btn-sm btn-danger">Удалить</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

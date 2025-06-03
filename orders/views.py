@@ -6,6 +6,20 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import View
 from .models import DeliveryMap, CustomerOrder, SupplierOrder
 from .utils.pdf_utils import generate_delivery_map_pdf, generate_customer_order_pdf, generate_supplier_order_pdf
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.urls import reverse_lazy
+from .models import (
+    CustomerOrder, OrderItem, DeliveryMap, DeliveryMapItem,
+    SupplierOrder, SupplierOrderItem, GoodsReceipt, GoodsReceiptItem,
+    SupplierPayment, DriverAssignment
+)
+from .forms import (
+    CustomerOrderForm, OrderItemForm, DeliveryMapForm, DeliveryMapItemForm,
+    SupplierOrderForm, SupplierOrderItemForm, GoodsReceiptForm, GoodsReceiptItemForm,
+    SupplierPaymentForm, DriverAssignmentForm
+)
+from core.mixins import RoleRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class DeliveryMapPDFView(View):
@@ -93,8 +107,8 @@ class PaymentReportView(TemplateView):
         report_data = []
 
         for supplier in suppliers:
-            current_total = current_month_dict.get(supplier.id, 0)
-            prev_total = prev_month_dict.get(supplier.id, 0)
+            current_total = current_month_dict.get(supplier.id, 0) if current_month_dict.get(supplier.id, 0) else 0
+            prev_total = prev_month_dict.get(supplier.id, 0) if prev_month_dict.get(supplier.id, 0) else 0
 
             # Расчет рекомендованной предоплаты
             difference = current_total - prev_total
@@ -234,3 +248,173 @@ def mark_as_delivered(request, assignment_id):
 
     messages.success(request, f"{assignment.orders.count()} заказов помечено как доставленные!")
     return redirect('delivery_orders')
+
+
+# CustomerOrder Views
+class CustomerOrderListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+    model = CustomerOrder
+    template_name = 'orders/customer_order_list.html'
+    context_object_name = 'orders'
+    allowed_roles = ['operator', 'orders_manager', 'supply_manager']
+    ordering = ['-created_at']
+
+
+class CustomerOrderCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
+    model = CustomerOrder
+    form_class = CustomerOrderForm
+    template_name = 'orders/customer_order_form.html'
+    success_url = reverse_lazy('customer_order_list')
+    allowed_roles = ['operator']
+
+
+class CustomerOrderUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
+    model = CustomerOrder
+    form_class = CustomerOrderForm
+    template_name = 'orders/customer_order_form.html'
+    success_url = reverse_lazy('customer_order_list')
+    allowed_roles = ['operator', 'orders_manager']
+
+
+class CustomerOrderDetailView(LoginRequiredMixin, RoleRequiredMixin, DetailView):
+    model = CustomerOrder
+    template_name = 'orders/customer_order_detail.html'
+    allowed_roles = ['operator', 'orders_manager', 'supply_manager']
+    context_object_name = 'order'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['can_edit'] = self.request.user.role in ['operator', 'orders_manager']
+        return context
+
+
+# OrderItem Views
+class OrderItemCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
+    model = OrderItem
+    form_class = OrderItemForm
+    template_name = 'orders/order_item_form.html'
+    allowed_roles = ['operator']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['order'] = CustomerOrder.objects.get(pk=self.kwargs['order_pk'])
+        return context
+
+    def form_valid(self, form):
+        order = CustomerOrder.objects.get(pk=self.kwargs['order_pk'])
+        form.instance.order = order
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('customer_order_detail', kwargs={'pk': self.kwargs['order_pk']})
+
+
+class OrderItemUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
+    model = OrderItem
+    form_class = OrderItemForm
+    template_name = 'orders/order_item_form.html'
+    allowed_roles = ['operator']
+
+    def get_success_url(self):
+        return reverse_lazy('customer_order_detail', kwargs={'pk': self.object.order.pk})
+
+
+# DeliveryMap Views
+class DeliveryMapDetailView(LoginRequiredMixin, RoleRequiredMixin, DetailView):
+    model = DeliveryMap
+    template_name = 'orders/delivery_map_detail.html'
+    allowed_roles = ['operator', 'parts_manager']
+
+
+# DeliveryMapItem Views
+class DeliveryMapItemUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
+    model = DeliveryMapItem
+    form_class = DeliveryMapItemForm
+    template_name = 'orders/delivery_map_item_form.html'
+    allowed_roles = ['parts_manager']
+
+    def get_success_url(self):
+        return reverse_lazy('delivery_map_detail', kwargs={'pk': self.object.delivery_map.pk})
+
+
+# SupplierOrder Views
+class SupplierOrderListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+    model = SupplierOrder
+    template_name = 'orders/supplier_order_list.html'
+    context_object_name = 'orders'
+    allowed_roles = ['supply_manager']
+    ordering = ['-created_at']
+
+
+class SupplierOrderCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
+    model = SupplierOrder
+    form_class = SupplierOrderForm
+    template_name = 'orders/supplier_order_form.html'
+    success_url = reverse_lazy('supplier_order_list')
+    allowed_roles = ['supply_manager']
+
+
+class SupplierOrderUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
+    model = SupplierOrder
+    form_class = SupplierOrderForm
+    template_name = 'orders/supplier_order_form.html'
+    success_url = reverse_lazy('supplier_order_list')
+    allowed_roles = ['supply_manager']
+
+
+# GoodsReceipt Views
+class GoodsReceiptListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+    model = GoodsReceipt
+    template_name = 'orders/goods_receipt_list.html'
+    context_object_name = 'receipts'
+    allowed_roles = ['supply_manager']
+    ordering = ['-received_at']
+
+
+class GoodsReceiptCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
+    model = GoodsReceipt
+    form_class = GoodsReceiptForm
+    template_name = 'orders/goods_receipt_form.html'
+    success_url = reverse_lazy('goods_receipt_list')
+    allowed_roles = ['supply_manager']
+
+
+# SupplierPayment Views
+class SupplierPaymentListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+    model = SupplierPayment
+    template_name = 'orders/supplier_payment_list.html'
+    context_object_name = 'payments'
+    allowed_roles = ['supply_manager']
+    ordering = ['-month']
+
+
+class SupplierPaymentCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
+    model = SupplierPayment
+    form_class = SupplierPaymentForm
+    template_name = 'orders/supplier_payment_form.html'
+    success_url = reverse_lazy('supplier_payment_list')
+    allowed_roles = ['supply_manager']
+
+
+# DriverAssignment Views
+class DriverAssignmentListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+    model = DriverAssignment
+    template_name = 'orders/driver_assignment_list.html'
+    context_object_name = 'assignments'
+    allowed_roles = ['delivery_manager']
+    ordering = ['-date']
+
+
+class DriverAssignmentCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
+    model = DriverAssignment
+    form_class = DriverAssignmentForm
+    template_name = 'orders/driver_assignment_form.html'
+    success_url = reverse_lazy('driver_assignment_list')
+    allowed_roles = ['delivery_manager']
+
+
+class MyDriverAssignmentUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
+    model = DriverAssignment
+    form_class = DriverAssignmentForm
+    template_name = 'orders/driver_assignment_form.html'
+    success_url = reverse_lazy('driver_assignment_list')
+    allowed_roles = ['delivery_manager']

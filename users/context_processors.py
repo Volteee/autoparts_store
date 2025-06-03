@@ -1,24 +1,55 @@
 def menu_items(request):
     items = []
     if request.user.is_authenticated:
+        # Общие пункты меню для всех ролей
+        items.append({'url': '/home/', 'title': 'Главная', 'icon': 'bi-house'})
+
         if request.user.role == 'operator':
-            items.append({'url': '/orders/create/', 'title': 'Создать заказ'})
-            items.append({'url': '/orders/', 'title': 'Мои заказы'})
+            # Меню для оператора
+            items.append({'url': '/core/customers/', 'title': 'Клиенты', 'icon': 'bi-people'})
+            items.append({'url': '/core/cars/', 'title': 'Автомобили', 'icon': 'bi-car-front'})
+            items.append({'url': '/orders/customer-orders/', 'title': 'Заказы покупателей', 'icon': 'bi-cart'})
 
-        if request.user.role == 'parts_manager':
-            items.append({'url': '/orders/process/', 'title': 'Обработка заказов'})
-            items.append({'url': '/parts/', 'title': 'Каталог деталей'})
+        elif request.user.role == 'parts_manager':
+            # Меню для менеджера по деталям
+            items.append({'url': '/parts/parts/', 'title': 'Детали', 'icon': 'bi-gear'})
+            items.append({'url': '/parts/manufacturers/', 'title': 'Производители', 'icon': 'bi-building'})
+            items.append({'url': '/parts/categories/', 'title': 'Категории', 'icon': 'bi-diagram-3'})
+            items.append({'url': '/parts/pricelists/', 'title': 'Прайс-листы', 'icon': 'bi-currency-exchange'})
 
-        if request.user.role == 'supply_manager':
-            items.append({'url': '/suppliers/orders/', 'title': 'Заказы поставщикам'})
-            items.append({'url': '/suppliers/reports/', 'title': 'Отчеты по платежам'})
+        elif request.user.role == 'orders_manager':
+            # Меню для менеджера по заказам
+            items.append({'url': '/orders/customer-orders/', 'title': 'Заказы покупателей', 'icon': 'bi-cart'})
+            items.append({'url': '/orders/supplier-orders/', 'title': 'Заказы поставщикам', 'icon': 'bi-truck'})
+            items.append({'url': '/parts/delivery-options/', 'title': 'Варианты доставки', 'icon': 'bi-clock'})
 
-        if request.user.role == 'storekeeper':
-            items.append({'url': '/warehouse/receipts/', 'title': 'Приходные накладные'})
-            items.append({'url': '/warehouse/inventory/', 'title': 'Инвентаризация'})
+        elif request.user.role == 'supply_manager':
+            # Меню для менеджера по поставкам
+            items.append({'url': '/parts/suppliers/', 'title': 'Поставщики', 'icon': 'bi-box-seam'})
+            items.append({'url': '/orders/supplier-orders/', 'title': 'Заказы поставщикам', 'icon': 'bi-clipboard-check'})
+            items.append({'url': '/orders/goods-receipts/', 'title': 'Приходные накладные', 'icon': 'bi-clipboard-data'})
+            items.append({'url': '/orders/payment-report/', 'title': 'Отчет по платежам', 'icon': 'bi-graph-up'})
 
-        if request.user.role == 'delivery_manager':
-            items.append({'url': '/delivery/schedule/', 'title': 'График доставок'})
-            items.append({'url': '/delivery/reports/', 'title': 'Отчеты по доставкам'})
+        elif request.user.role == 'storekeeper':
+            # Меню для кладовщика
+            items.append({'url': '/orders/goods-receipts/', 'title': 'Приходные накладные', 'icon': 'bi-clipboard-check'})
+            items.append({'url': '/parts/parts/', 'title': 'Складские позиции', 'icon': 'bi-boxes'})
+            items.append({'url': '#', 'title': 'Печать ценников', 'icon': 'bi-printer'})
+            items.append({'url': '#', 'title': 'Инвентаризация', 'icon': 'bi-clipboard'})
+
+        elif request.user.role == 'delivery_manager':
+            # Меню для начальника службы доставки
+            items.append({'url': '/core/drivers/', 'title': 'Водители', 'icon': 'bi-person-badge'})
+            items.append({'url': '/orders/driver-assignments/', 'title': 'Назначения', 'icon': 'bi-calendar-check'})
+            items.append({'url': '#', 'title': 'Отчет по доставкам', 'icon': 'bi-graph-up'})
+
+        elif request.user.role == 'driver':
+            # Меню для водителя
+            items.append({'url': '#', 'title': 'Мои доставки', 'icon': 'bi-list-task'})
+            items.append({'url': '#', 'title': 'Карты доставки', 'icon': 'bi-map'})
+            items.append({'url': '#', 'title': 'Маршруты', 'icon': 'bi-signpost'})
+
+        # Общий пункт для профиля
+        items.append({'url': '#', 'title': 'Профиль', 'icon': 'bi-person'})
 
     return {'menu_items': items}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Распределение товаров дилерам</h1>
+<form method="post">
+    {% csrf_token %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th rowspan="2">Артикул</th>
+                <th rowspan="2">Наименование</th>
+                <th rowspan="2">Общий остаток</th>
+                {% for dealer in dealers %}
+                <th colspan="4" class="text-center">{{ dealer.customer.name }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for dealer in dealers %}
+                <th>Норма</th>
+                <th>Текущий запас</th>
+                <th>Спрос</th>
+                <th>К отправке</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in report_data %}
+            <tr>
+                <td>{{ item.part.original_number }}</td>
+                <td>{{ item.part.name }}</td>
+                <td>{{ item.total_stock }}</td>
+                {% for dealer_data in item.dealers %}
+                <td>{{ dealer_data.norm.norm|default:"0" }}</td>
+                <td>{{ dealer_data.norm.current_stock|default:"0" }}</td>
+                <td>{{ dealer_data.demand }}</td>
+                <td>
+                    <input type="number" name="quantity_{{ item.part.id }}_{{ dealer_data.dealer.id }}"
+                           value="{{ dealer_data.quantity_to_send }}" min="0" class="form-control">
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Сохранить распределение</button>
+</form>
+{% endblock %}

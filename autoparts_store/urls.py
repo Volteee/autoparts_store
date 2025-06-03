@@ -30,6 +30,7 @@ urlpatterns = [
     # Главная страница
     path('home/', CustomHomeView.as_view(), name='home'),
     path('core/', include('core.urls')),
+    path('parts/', include('parts.urls')),
 
     # Вход/выход
     path('login/', CustomLoginView.as_view(), name='login'),

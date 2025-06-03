@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Привязка пользователей к водителям{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-warning">
+        <h2>Привязка пользователей к водителям</h2>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h4>Водители без учетной записи</h4>
+                    {% if unassigned_drivers %}
+                    <div class="list-group">
+                        {% for driver in unassigned_drivers %}
+                        <div class="list-group-item">
+                            {{ driver.name }} - {{ driver.phone }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success">
+                        Все водители имеют привязанные учетные записи
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <h4>Пользователи без водителя</h4>
+                    {% if available_users %}
+                    <div class="list-group">
+                        {% for user in available_users %}
+                        <div class="list-group-item">
+                            {{ user.username }} - {{ user.get_full_name|default:"Имя не указано" }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        Нет свободных пользователей с ролью "Водитель"
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if unassigned_drivers and available_users %}
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="id_driver" class="form-label">Выберите водителя</label>
+                    {{ form.driver }}
+                </div>
+                <div class="col-md-6">
+                    <label for="id_user" class="form-label">Выберите пользователя</label>
+                    {{ form.user }}
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">
+                    Привязать пользователя
+                </button>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}

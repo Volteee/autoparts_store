@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Автомобиль {{ car.make }} {{ car.model }}{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>{{ car.year }} {{ car.make }} {{ car.model }}</h2>
+            <a href="{% url 'car_update' car.pk %}" class="btn btn-light">
+                Редактировать
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Техническая информация</h5>
+                <table class="table table-borderless">
+                    <tr>
+                        <th>VIN-код:</th>
+                        <td><code>{{ car.vin }}</code></td>
+                    </tr>
+                    <tr>
+                        <th>Год выпуска:</th>
+                        <td>{{ car.year }}</td>
+                    </tr>
+                    <tr>
+                        <th>Марка:</th>
+                        <td>{{ car.make }}</td>
+                    </tr>
+                    <tr>
+                        <th>Модель:</th>
+                        <td>{{ car.model }}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="col-md-6">
+                <h5>Владелец</h5>
+                <div class="card">
+                    <div class="card-body">
+                        <h6>{{ car.customer.name }}</h6>
+                        <p class="mb-1">
+                            <i class="bi bi-telephone"></i> {{ car.customer.phone }}
+                        </p>
+                        <a href="{% url 'customer_detail' car.customer.pk %}" class="btn btn-sm btn-outline-primary mt-2">
+                            Профиль клиента
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <h5>История заказов для этого автомобиля</h5>
+    </div>
+    <div class="card-body">
+        {% if orders %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Дата заказа</th>
+                        <th>Номер заказа</th>
+                        <th>Статус</th>
+                        <th>Сумма</th>
+                        <th>Детали</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.created_at|date:"d.m.Y" }}</td>
+                        <td>#{{ order.id }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if order.status == 'completed' %}bg-success
+                                {% elif order.status == 'in_progress' %}bg-warning
+                                {% else %}bg-secondary{% endif %}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </td>
+                        <td>{{ order.total_amount }} руб.</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-primary">
+                                Просмотреть
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            Для этого автомобиля еще не было заказов
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

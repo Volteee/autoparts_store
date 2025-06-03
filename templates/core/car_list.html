@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Управление автомобилями{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Автомобили клиентов</h1>
+    <a href="{% url 'car_create' %}" class="btn btn-success">
+        + Добавить автомобиль
+    </a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header bg-light">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <input type="text" name="search" value="{{ search_query }}" 
+                       class="form-control" placeholder="Поиск по марке, модели или VIN">
+            </div>
+            <div class="col-md-5">
+                <select name="customer" class="form-select">
+                    <option value="">Все владельцы</option>
+                    {% for customer in customers %}
+                    <option value="{{ customer.id }}" 
+                            {% if selected_customer == customer.id|stringformat:"s" %}selected{% endif %}>
+                        {{ customer.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Фильтровать</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if cars %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Марка</th>
+                        <th>Модель</th>
+                        <th>Год</th>
+                        <th>VIN</th>
+                        <th>Владелец</th>
+                        <th>Телефон</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for car in cars %}
+                    <tr>
+                        <td>{{ car.make }}</td>
+                        <td>{{ car.model }}</td>
+                        <td>{{ car.year }}</td>
+                        <td><code>{{ car.vin }}</code></td>
+                        <td>{{ car.customer.name }}</td>
+                        <td>{{ car.customer.phone }}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'car_detail' car.pk %}" class="btn btn-outline-primary">
+                                    Просмотр
+                                </a>
+                                <a href="{% url 'car_update' car.pk %}" class="btn btn-outline-secondary">
+                                    Редакт.
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Пагинация -->
+        {% if is_paginated %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">&laquo; первая</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">предыдущая</a>
+                </li>
+                {% endif %}
+                
+                <li class="page-item disabled">
+                    <span class="page-link">
+                        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">следующая</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-info">
+            Автомобили не найдены. <a href="{% url 'car_create' %}">Добавить первый автомобиль</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

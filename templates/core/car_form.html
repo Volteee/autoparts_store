@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Редактирование автомобиля{% else %}Добавление автомобиля{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h2>{% if object %}Редактирование автомобиля{% else %}Добавление нового автомобиля{% endif %}</h2>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="id_customer" class="form-label">Владелец *</label>
+                    {{ form.customer }}
+                    <div class="form-text">Выберите клиента из списка</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="id_make" class="form-label">Марка *</label>
+                    {{ form.make }}
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="id_model" class="form-label">Модель *</label>
+                    {{ form.model }}
+                </div>
+                <div class="col-md-6">
+                    <label for="id_year" class="form-label">Год выпуска *</label>
+                    {{ form.year }}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="id_vin" class="form-label">VIN-код *</label>
+                {{ form.vin }}
+                <div class="form-text">17 символов (буквы и цифры)</div>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                {% if object %}
+                <a href="{% url 'car_detail' object.pk %}" class="btn btn-secondary">
+                    Отмена
+                </a>
+                {% else %}
+                <a href="{% url 'car_list' %}" class="btn btn-secondary">
+                    Отмена
+                </a>
+                {% endif %}
+                <button type="submit" class="btn btn-primary">
+                    {% if object %}Сохранить изменения{% else %}Добавить автомобиль{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if object and object.customer %}
+<div class="card mt-4">
+    <div class="card-header bg-light">
+        <h5>Дополнительные действия</h5>
+    </div>
+    <div class="card-body">
+        <a href="{% url 'customer_detail' object.customer.pk %}" class="btn btn-outline-primary me-2">
+            Перейти к владельцу
+        </a>
+        <a href="{% url 'car_create' %}?customer={{ object.customer.id }}" class="btn btn-outline-success">
+            Добавить еще авто для этого клиента
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

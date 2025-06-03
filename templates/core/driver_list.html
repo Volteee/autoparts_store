@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Управление водителями{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Управление водителями</h1>
+    <a href="{% url 'driver_create' %}" class="btn btn-success">
+        + Добавить водителя
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <span>Активные водители</span>
+            <a href="{% url 'driver_assign_user' %}" class="btn btn-sm btn-light">
+                Привязать пользователей
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for driver in drivers %}
+            {% if driver.is_active %}
+            <div class="col">
+                <div class="card h-100 card-hover">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ driver.name }}</h5>
+                        <p class="card-text">
+                            <i class="bi bi-telephone"></i> {{ driver.phone }}
+                        </p>
+                        {% if driver.user %}
+                        <span class="badge bg-success">Пользователь: {{ driver.user.username }}</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">Пользователь не привязан</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{% url 'driver_detail' driver.pk %}" class="btn btn-sm btn-outline-primary">
+                            Подробнее
+                        </a>
+                        <a href="{% url 'driver_update' driver.pk %}" class="btn btn-sm btn-outline-secondary">
+                            Редактировать
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">Нет активных водителей</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% if inactive_drivers.exists %}
+<div class="card">
+    <div class="card-header bg-secondary text-white">
+        Неактивные водители
+    </div>
+    <div class="card-body">
+        <div class="list-group">
+            {% for driver in inactive_drivers %}
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-1">{{ driver.name }}</h6>
+                    <small>{{ driver.phone }}</small>
+                </div>
+                <a href="{% url 'driver_update' driver.pk %}" class="btn btn-sm btn-outline-secondary">
+                    Активировать
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
